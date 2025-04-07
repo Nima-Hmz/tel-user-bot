@@ -20,8 +20,8 @@ phone = '+989229150579'
 # Create the client but don't start it yet
 client = TelegramClient('session_name', api_id, api_hash)
 
-# Force connection to a specific data center (e.g., DC2 using production configuration)
-client.session.set_dc(2, '149.154.167.50', 443)
+# Remove the forced data center connection as it may be causing issues
+# client.session.set_dc(2, '149.154.167.50', 443)
 
 @client.on(events.NewMessage(incoming=True))
 async def handle_new_message(event):
@@ -36,17 +36,17 @@ async def main():
     try:
         print("Starting client...")
         
-        # Connect to Telegram servers
-        await client.connect()
+        # Let Telethon handle the connection automatically
+        # await client.connect()
         
-        # Check if we're already authorized
-        if not await client.is_user_authorized():
-            print("Not authorized, signing in...")
-            # This will use the phone
-            await client.sign_in(phone=phone)
-            print("Successfully signed in!")
+        # Use start() with the phone parameter instead of connect() + sign_in()
+        await client.start(phone=lambda: phone)
+        
+        if await client.is_user_authorized():
+            print("Successfully authorized!")
         else:
-            print("Already authorized")
+            print("Authorization failed. You may need to provide the code sent to your phone.")
+            # If you need to enter a code manually, you can create a local session first
         
         print("Listening for new direct messages...")
         # Keep the client running
