@@ -6,7 +6,7 @@ api_id = 28921433
 api_hash = 'f1adfe69f1f327b4ebceca39538ca389'
 
 # Your phone number with country code (e.g., +15551234567)
-phone = '09229150579'
+phone = '+989229150579'
 
 # Hardcoded verification code callback function
 # This will return the specified code when requested
