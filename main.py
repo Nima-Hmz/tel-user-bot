@@ -10,10 +10,7 @@ phone = '09229150579'
 
 # Hardcoded verification code callback function
 # This will return the specified code when requested
-async def code_callback():
-    # You'll need to replace this with the actual code you receive
-    # This is just a placeholder and won't work until you put your real code here
-    return "12345"  # Replace with the verification code you receive
+
 
 # Password callback in case 2FA is enabled
 # async def password_callback():
@@ -45,8 +42,8 @@ async def main():
         # Check if we're already authorized
         if not await client.is_user_authorized():
             print("Not authorized, signing in...")
-            # This will use the phone and code_callback
-            await client.sign_in(phone=phone, code_callback=code_callback)
+            # This will use the phone
+            await client.sign_in(phone=phone)
             print("Successfully signed in!")
         else:
             print("Already authorized")
