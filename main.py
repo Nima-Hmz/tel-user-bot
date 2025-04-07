@@ -1,4 +1,5 @@
 from telethon import TelegramClient, events
+import asyncio
 
 # Replace these with your actual credentials from my.telegram.org
 api_id = 28921433
@@ -7,7 +8,19 @@ api_hash = 'f1adfe69f1f327b4ebceca39538ca389'
 # Your phone number with country code (e.g., +15551234567)
 phone = '09229150579'
 
-# 'session_name' will be used to store your session details locally
+# Hardcoded verification code callback function
+# This will return the specified code when requested
+async def code_callback():
+    # You'll need to replace this with the actual code you receive
+    # This is just a placeholder and won't work until you put your real code here
+    return "12345"  # Replace with the verification code you receive
+
+# Password callback in case 2FA is enabled
+# async def password_callback():
+#     # If you have two-factor authentication enabled, put your password here
+#     return "your_2fa_password_here"  # Replace if you have 2FA
+
+# Create the client but don't start it yet
 client = TelegramClient('session_name', api_id, api_hash)
 
 # Force connection to a specific data center (e.g., DC2 using production configuration)
@@ -21,24 +34,30 @@ async def handle_new_message(event):
         await client.send_message('me', event.message)
         print("Forwarded a message to Saved Messages.")
 
-# Define a function to handle login
+# The non-interactive way to start Telethon
 async def main():
-    # This will automatically prompt for login if required
-    # For non-interactive environments, we need to handle it here
-    if not await client.is_user_authorized():
-        try:
-            await client.start(phone=phone)
-            print("Client authorized successfully.")
-        except Exception as e:
-            print(f"Authentication error: {e}")
-            return
+    try:
+        print("Starting client...")
+        
+        # Connect to Telegram servers
+        await client.connect()
+        
+        # Check if we're already authorized
+        if not await client.is_user_authorized():
+            print("Not authorized, signing in...")
+            # This will use the phone and code_callback
+            await client.sign_in(phone=phone, code_callback=code_callback)
+            print("Successfully signed in!")
+        else:
+            print("Already authorized")
+        
+        print("Listening for new direct messages...")
+        # Keep the client running
+        await client.run_until_disconnected()
+    except Exception as e:
+        print(f"Error: {e}")
 
-    print("Listening for new direct messages...")
-    
-    # This keeps the client running until you interrupt it
-    await client.run_until_disconnected()
-
-# Start the client without the interactive prompt
-with client:
-    client.loop.run_until_complete(main())
+# Run the client without using a context manager
+if __name__ == "__main__":
+    asyncio.run(main())
 
